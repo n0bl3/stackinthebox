@@ -31,7 +31,7 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
 
   # If true, then any SSH connections made will enable agent forwarding.
   # Default value: false
-  # config.ssh.forward_agent = true
+  config.ssh.forward_agent = true
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -42,8 +42,11 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
   config.vm.provider :virtualbox do |vb|
      vb.customize ["modifyvm", :id, "--memory", "4096"]
   end
+
   config.vm.provision :puppet do |puppet|
+    puppet.module_path = "puppet/modules"
     puppet.manifests_path = "manifests"
-    puppet.manifest_file  = "init.pp"
+    puppet.manifest_file = "init.pp"
+    puppet.options = "--verbose --debug"
   end
 end

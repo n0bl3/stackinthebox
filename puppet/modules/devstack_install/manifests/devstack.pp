@@ -3,7 +3,6 @@ class devstack {
 
     package {"git": 
         ensure => installed,
-        # notify => Notify["Cloning devstack"],
     }
 
     exec { "git clone https://github.com/openstack-dev/devstack.git":
@@ -15,6 +14,7 @@ class devstack {
         user => "${configs::vagrant_user}",
         require => [User["${configs::vagrant_user}"], 
                     Package["git"]],
+                    #notify {"Cloning devstack":},
     }
 
     file { "/home/vagrant/devstack":
@@ -50,8 +50,6 @@ class devstack {
         logoutput => true,
         user      => "${configs::vagrant_user}",
         require   => File["/home/vagrant/devstack/localrc"],
-        notify    => Notify[ "Installing devstack" ],
+        #notify {"Installing devstack": },
     }
-    
-    notify {"Installing devstack" :}
 }
