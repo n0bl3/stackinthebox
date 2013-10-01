@@ -20,7 +20,7 @@ else
     echo 'All nova options are set correctly'
 fi
 
-scp rverchikov@172.18.198.123:/home/rverchikov/Downloads/iso/centos-kvm/centos-6.4.qcow2 $HOME
+scp rverchikov@172.18.194.123:/home/rverchikov/Downloads/iso/centos-kvm/centos-6.4.qcow2 $HOME
 
 image_exists=$(glance image-list | grep $image_name | wc -l)
 if [[ $image_exists -ne 0 ]]; then
