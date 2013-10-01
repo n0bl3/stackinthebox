@@ -2,7 +2,7 @@ class smb {
     include configs
 
     file {"smb.conf":
-        path => "/etc/samba/smb.conf",
+        path   => "/etc/samba/smb.conf",
         source => "${configs::config_dir}/smb.conf",
     }
 
@@ -11,10 +11,11 @@ class smb {
     }
 
     service { "smbd":
-        ensure => running,
-        enable => true,
+        name      => "smbd",
+        ensure    => running,
+        # enable  => true,
         subscribe => File["smb.conf"],
-        require => Package["samba"],
+        require   => Package["samba"],
     }
 }
 
