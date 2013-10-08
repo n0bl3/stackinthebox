@@ -4,49 +4,40 @@
 VAGRANT_API_VERSION = "2"
 
 Vagrant.configure(VAGRANT_API_VERSION) do |config|
-  # All Vagrant configuration is done here. The most common configuration
-  # options are documented and commented below. For a complete reference,
-  # please see the online documentation at vagrantup.com.
+  # Ubuntu 12.04 with openstack-all-in-one installed via devstack
+  # and sources exported through smb
+  config.vm.define "openstack" do |openstack|
+    openstack.vm.box = "openstack-all-in-one"
+    openstack.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    openstack.vm.network :private_network, ip: "192.168.33.11"
+    openstack.ssh.forward_agent = true
+    openstack.vm.provider :virtualbox do |vb|
+       vb.customize ["modifyvm", :id, "--memory", "4096"]
+    end
 
-  # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "openstack-all-in-one"
-
-  # The url from where the 'config.vm.box' box will be fetched if it
-  # doesn't already exist on the user's system.
-  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network :forwarded_port, guest: 80, host: 8080
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  config.vm.network :private_network, ip: "192.168.33.11"
-
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network :public_network
-
-  # If true, then any SSH connections made will enable agent forwarding.
-  # Default value: false
-  config.ssh.forward_agent = true
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "c:\\cygwin64\\home\\Roman", "/home/vagrant"
-
-  config.vm.provider :virtualbox do |vb|
-     vb.customize ["modifyvm", :id, "--memory", "4096"]
+    openstack.vm.provision :puppet do |puppet|
+      puppet.module_path = "puppet/modules"
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "init.pp"
+      puppet.options = "--verbose --debug"
+    end
   end
 
-  config.vm.provision :puppet do |puppet|
-    puppet.module_path = "puppet/modules"
-    puppet.manifests_path = "manifests"
-    puppet.manifest_file = "init.pp"
-    puppet.options = "--verbose --debug"
+  # Clean Ubuntu 12.04
+  config.vm.define "ubuntu" do |ubuntu|
+    ubuntu.vm.box = "ubuntu-clean"
+    ubuntu.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    ubuntu.vm.network :private_network, ip: "192.168.33.22"
+    ubuntu.ssh.forward_agent = true
+    #ubuntu.ssh.private_key_path = "C:/cygwin64/home/Roman/.ssh/id_rsa"
+    #ubuntu.ssh.username = "Roman"
+    #ubuntu.vm.synced_folder File.expand_path('~'), "/home/vagrant"
+    ubuntu.vm.provider :virtualbox do |vb|
+       vb.customize ["modifyvm", :id, "--memory", "1024"]
+    end
+    ubuntu.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "ubuntu_init.pp"
+    end
   end
 end
