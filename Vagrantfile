@@ -40,4 +40,31 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
       puppet.manifest_file = "ubuntu_init.pp"
     end
   end
+
+  # Gearbox dev center
+  config.vm.define "gearbox" do |gearbox|
+    gearbox.vm.box = "gearbox"
+    gearbox.vm.hostname = "gearbox"
+    gearbox.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    gearbox.vm.network "public_network", :bridge => 'eth1'
+    gearbox.ssh.forward_agent = true
+    gearbox.vm.synced_folder "/home/rverchikov/workspace", "/synced/workspace"
+    gearbox.vm.provider :virtualbox do |vb|
+       vb.customize ["modifyvm", :id, "--memory", "1024"]
+    end
+    gearbox.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file = "gearbox.pp"
+    end
+  end
+  # centos
+  config.vm.define "centos" do |centos|
+    centos.vm.box = "centos"
+    centos.vm.box_url = "http://rverchikov-pc/vagrant-boxes/centos.box"
+    centos.vm.network :private_network, ip: "192.168.33.33"
+    centos.ssh.forward_agent = true
+    centos.vm.provider :virtualbox do |vb|
+       vb.customize ["modifyvm", :id, "--memory", "1024"]
+    end
+  end
 end
