@@ -7,12 +7,14 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
   # Ubuntu 12.04 with openstack-all-in-one installed via devstack
   # and sources exported through smb
   config.vm.define "openstack" do |openstack|
-    openstack.vm.box = "openstack-all-in-one"
+    openstack.vm.box = "openstack"
+    openstack.vm.hostname = "openstack"
     openstack.vm.box_url = "http://files.vagrantup.com/precise64.box"
     openstack.vm.network :private_network, ip: "192.168.33.11"
+    # openstack.vm.network "public_network", :bridge => 'eth1'
     openstack.ssh.forward_agent = true
     openstack.vm.provider :virtualbox do |vb|
-       vb.customize ["modifyvm", :id, "--memory", "4096"]
+      vb.customize ["modifyvm", :id, "--memory", "4096"]
     end
 
     openstack.vm.provision :puppet do |puppet|
@@ -50,7 +52,7 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
     gearbox.ssh.forward_agent = true
     gearbox.vm.synced_folder "/home/rverchikov/workspace", "/synced/workspace"
     gearbox.vm.provider :virtualbox do |vb|
-       vb.customize ["modifyvm", :id, "--memory", "1024"]
+      vb.customize ["modifyvm", :id, "--memory", "1024"]
     end
     gearbox.vm.provision :puppet do |puppet|
       puppet.manifests_path = "manifests"
